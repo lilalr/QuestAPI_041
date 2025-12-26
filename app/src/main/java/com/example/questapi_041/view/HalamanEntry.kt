@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -26,7 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.questapi_041.R
 import com.example.questapi_041.modeldata.DetailSiswa
 import com.example.questapi_041.modeldata.UIStateSiswa
-import com.example.questapi_041.view.route.DestinasiEntry
+import com.example.questapi_041.uicontroller.route.DestinasiEntry
 import com.example.questapi_041.viewmodel.EntryViewModel
 import com.example.questapi_041.viewmodel.provider.PenyediaViewModel
 import kotlinx.coroutines.launch
@@ -40,7 +41,6 @@ fun EntrySiswaScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -68,6 +68,7 @@ fun EntrySiswaScreen(
         )
     }
 }
+
 @Composable
 fun EntrySiswaBody(
     uiStateSiswa: UIStateSiswa,
@@ -95,6 +96,7 @@ fun EntrySiswaBody(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormTambahSiswa(
     detailSiswa: DetailSiswa,
@@ -106,7 +108,6 @@ fun FormTambahSiswa(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
     ) {
-
         OutlinedTextField(
             value = detailSiswa.nama,
             onValueChange = { onValueChange(detailSiswa.copy(nama = it)) },
@@ -127,7 +128,7 @@ fun FormTambahSiswa(
             value = detailSiswa.telpon,
             onValueChange = { onValueChange(detailSiswa.copy(telpon = it)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            label = { Text(text = stringResource(R.string.telpon)) },
+            label = { Text(stringResource(R.string.telpon)) },
             modifier = Modifier.fillMaxWidth(),
             enabled = enabled,
             singleLine = true

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,11 +34,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.questapi_041.viewmodel.provider.PenyediaViewModel
 import com.example.questapi_041.R
 import com.example.questapi_041.modeldata.DataSiswa
-import com.example.questapi_041.view.route.DestinasiHome
+import com.example.questapi_041.uicontroller.route.DestinasiHome
 import com.example.questapi_041.viewmodel.HomeViewModel
-import com.example.questapi_041.viewmodel.provider.PenyediaViewModel
 import com.example.questapi_041.viewmodel.StatusUiSiswa
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,7 +63,7 @@ fun HomeScreen(
             FloatingActionButton(
                 onClick = navigateToItemEntry,
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
+                modifier = Modifier.padding(dimensionResource(R.dimen.padding_large))
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -82,7 +83,6 @@ fun HomeScreen(
     }
 }
 
-
 @Composable
 fun HomeBody(
     statusUiSiswa: StatusUiSiswa,
@@ -96,12 +96,14 @@ fun HomeBody(
     ) {
         when (statusUiSiswa) {
             is StatusUiSiswa.Loading -> LoadingScreen()
-            is StatusUiSiswa.Success ->
-                DaftarSiswa(
-                    dataSiswa = statusUiSiswa.listSiswa,
-                    onSiswaClick = onSiswaClick
-                )
-            is StatusUiSiswa.Error -> ErrorScreen(retryAction)
+            is StatusUiSiswa.Success -> DaftarSiswa(
+                itemSiswa = statusUiSiswa.Siswa,
+                onSiswaClick = { onSiswaClick(it.id) })
+
+            is StatusUiSiswa.Error -> ErrorScreen(
+                retryAction,
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }
@@ -125,26 +127,27 @@ fun ErrorScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = stringResource(R.string.gagal))
+        Text(text = stringResource(R.string.gagal),
+            modifier = Modifier.padding(16.dp))
         Button(onClick = retryAction) {
-            Text(stringResource(R.string.retry))
+            Text(text = stringResource(R.string.retry))
         }
     }
 }
 
 @Composable
 fun DaftarSiswa(
-    dataSiswa: List<DataSiswa>,
-    onSiswaClick: (Int) -> Unit,
+    itemSiswa: List<DataSiswa>,
+    onSiswaClick: (DataSiswa) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(modifier = modifier) {
-        items(items = dataSiswa, key = { it.id }) { person ->
+    LazyColumn(modifier = Modifier) {
+        items(items = itemSiswa, key = { it.id }) { person ->
             ItemSiswa(
                 siswa = person,
                 modifier = Modifier
                     .padding(dimensionResource(id = R.dimen.padding_small))
-                    .clickable { onSiswaClick(person.id) }
+                    .clickable { onSiswaClick(person) }
             )
         }
     }
@@ -160,21 +163,20 @@ fun ItemSiswa(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
-            modifier = Modifier
-                .padding(dimensionResource(id = R.dimen.padding_large))
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = siswa.nama,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
                 )
                 Spacer(Modifier.weight(1f))
                 Icon(
                     imageVector = Icons.Default.Phone,
-                    contentDescription = null
+                    contentDescription = null,
                 )
                 Text(
                     text = siswa.telpon,
